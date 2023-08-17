@@ -5,7 +5,7 @@ source .env
 
 declare -A DIRS=(
     ["$LOCAL_PATH/web/libraries"]="$REMOTE_PATH/web"
-    ["$LOCAL_PATH/web/themes/custom/lapanterarossa"]="$REMOTE_PATH/web/themes/custom"
+    ["$LOCAL_PATH/web/themes/custom/$THEME_NAME"]="$REMOTE_PATH/web/themes/custom"
     ["$LOCAL_PATH/web/modules"]="$REMOTE_PATH/web"
     ["$LOCAL_PATH/vendor"]="$REMOTE_PATH"
     ["$LOCAL_PATH/web/sites/default/files"]="$REMOTE_PATH/web/sites/default"
@@ -16,7 +16,7 @@ SSH_DB_PATH="$REMOTE_PATH/db/"
 
 #Dump file parameters
 LOCAL_BACKUP_PATH="$LOCAL_PATH/db"
-FILENAME="lapanterarrossa_$(date +'%d_%m_%Y_%H%M').sql"
+FILENAME="$LOCAL_DB_NAME_$(date +'%d_%m_%Y_%H%M').sql"
 
 # Dump the database
 mysqldump $LOCAL_DB_NAME > $LOCAL_BACKUP_PATH/$FILENAME
