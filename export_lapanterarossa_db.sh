@@ -16,11 +16,24 @@ SSH_DB_PATH="$REMOTE_PATH/db/"
 
 #Dump file parameters
 LOCAL_BACKUP_PATH="$LOCAL_PATH/db"
+
+# 1. Dump the remote specified tables
+REMOTE_DUMP_NAME="remote_extract_$(date +'%d_%m_%Y_%H%M').sql"
+ssh $SSH_USER@$SSH_SERVER <<EOF
+    mysqldump -u $REMOTE_DB_USER -p$REMOTE_DB_PASS -h $REMOTE_DB_HOST $REMOTE_DB_NAME commerce_order commerce_order_item commerce_order_item__adjustments commerce_order__adjustments commerce_order__coupons commerce_order__order_items users > $SSH_DB_PATH/$REMOTE_DUMP_NAME
+EOF
+
+# 2. Download the remote extract to local environment
+rsync -avz $SSH_USER@$SSH_SERVER:$SSH_DB_PATH/$REMOTE_DUMP_NAME $LOCAL_BACKUP_PATH/
+
+# 3. Insert the downloaded tables' data into your local database
+mysql $LOCAL_DB_NAME < $LOCAL_BACKUP_PATH/$REMOTE_DUMP_NAME
+
+# 4. Dump and sync your entire local database (now with downloaded tables) to the remote
 FILENAME="$LOCAL_DB_NAME_$(date +'%d_%m_%Y_%H%M').sql"
 
 # Dump the database
 mysqldump $LOCAL_DB_NAME > $LOCAL_BACKUP_PATH/$FILENAME
-
 echo "DB saved at $LOCAL_BACKUP_PATH/$FILENAME"
 
 # Sync the dump file to the remote server
